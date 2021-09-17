@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { VictoryBar, VictoryVoronoiContainer, VictoryTooltip, VictoryZoomContainer, VictoryLegend, VictoryArea, VictoryLabel, VictoryChart, VictoryAxis, VictoryTheme, VictoryStack, VictoryBoxPlot, VictoryPie, VictoryPolarAxis, VictoryGroup} from 'victory';
+import { VictoryBar, VictoryVoronoiContainer, VictoryTooltip, VictoryZoomContainer, VictoryLegend, VictoryArea, VictoryLabel, VictoryChart, VictoryAxis, VictoryTheme, VictoryStack, VictoryBoxPlot, VictoryPie, VictoryPolarAxis, VictoryGroup, Voronoi} from 'victory';
 import {VictoryHistogram} from 'victory-histogram';
 import { VictoryScatter } from 'victory-scatter';
 
@@ -141,8 +141,19 @@ let course_progress_pie = []
 
 for (let i =0; i<Student_param_progress.length; i++){
   course_progress_pie.push({x: "Progress Made",y: Student_param_progress[i].Pct_Read},
+  //{x: "Progress Left",y: 100});
   {x: "Progress Left",y: Student_param_progress[i].Pct_Remaining});
   }
+
+
+let course_progress_pie_100 = []
+
+  for (let i =0; i<Student_param_progress.length; i++){
+    course_progress_pie_100.push(
+      //{x: "Progress Made",y: Student_param_progress[i].Pct_Read},
+    //{x: "Progress Left",y: 100});
+    {x: "Progress Total",y: 1});
+    }
 
 
 
@@ -191,20 +202,19 @@ class Main extends React.Component {
         
         
 <h1>Quiz Grade Scatterplot V1</h1>
-<VictoryChart 
+<VictoryChart
 width = {600}
 height ={300}
 domainPadding={20}
   theme={VictoryTheme.material}
-  domain={{ y: [0.99*mins, 1.01*maxs] }} // This ensures that the y-axis values are centered around the data //
+  //domain={{ y: [0.99*mins, 1.01*maxs] }} // This ensures that the y-axis values are centered around the data //
+  domain = {{y:[0,100]}}
   
-  //containerComponent={
-    //<VictoryVoronoiContainer
-      //mouseFollowTooltips
-       //voronoiDimension="x"
-       //labels={({ datum }) => Math.round(`${datum.y}`)}
-     ///>
-  // }
+  containerComponent={
+    <VictoryVoronoiContainer 
+
+     />
+   }
 
  //containerComponent={
    //<VictoryZoomContainer/> // Let's you zoom in and out. Seems like it only works well with one view //
@@ -235,11 +245,11 @@ domainPadding={20}
      
     style={{ data: { fill: "#C43A31", stroke: "#000000", strokeWidth: 1}, labels:{fill: "#000000"}}}
     size={5}
+    //labelComponent = {<VictoryVoronoiContainer labels={({ datum }) => Math.round(`${datum.Score}`)}/>}
     data={dataquiz_sp.filter(quiz => quiz.Quiz === Quiz_Name_Parameter)}
     x={"StudentID"}
     y={"Score"}
     labels={({ datum }) => Math.round(`${datum.Score}`)}
-    //labelComponent = {<VictoryTooltip/>}
     
 
     
@@ -256,7 +266,8 @@ width = {600}
 height ={300}
 domainPadding={20}
   theme={VictoryTheme.material}
-  domain={{ y: [0.99*mins, 1.01*maxs] }} // This ensures that the y-axis values are centered around the data //
+  //domain={{ y: [0.99*mins, 1.01*maxs] }} // This ensures that the y-axis values are centered around the data //
+  domain = {{y:[0,100]}}
   
   //containerComponent={
    // <VictoryVoronoiContainer
@@ -560,6 +571,10 @@ style={{grid: {
               data={dataprogress_student_course.filter(course => course.Course === Course_Param)} // Filtering progress data for the given course //
               x={"Student"}
               y={"Pct_Read"}
+              labels = { (datum)  => Math.round(`${datum.Number_of_Courses_Read}`)} // Number of read units //
+              labelComponent={<VictoryTooltip />}
+
+
 
             />
 
@@ -571,6 +586,7 @@ style={{grid: {
               y={"Pct_Remaining"}
               //labels = {(datum) => datum.Pct_Read+"%"}
               labels = { (datum)  => Math.round(`${datum.Pct_Read}`)+"%"}
+
 
             />
 
@@ -629,6 +645,8 @@ style={{grid: {
                 && course.Student === Student_Param)} // Filtering progress data for the given course and student //
               x={"Student"}
               y={"Pct_Read"}
+              labels = { (datum)  => Math.round(`${datum.Number_of_Courses_Read}`)} // Number of read units //
+              labelComponent={<VictoryTooltip />}
 
             />
 
@@ -698,6 +716,8 @@ style={{grid: {
               data={dataprogress_course.filter(course => course.Course===Course_Param)} // Filtering progress data for the given course //
               x={"Course"}
               y={"Avg_Completion_Rate"}
+              labels = { (datum)  => Math.round(`${datum.Avg_Completion_Rate}`)+"%"} // Change this to number of read units //
+              labelComponent={<VictoryTooltip />}
             />
 
             <VictoryBar
@@ -756,6 +776,21 @@ style={{grid: {
 <VictoryLabel text={"Progress for Student "+ Student_Param+", "+Course_Param} x={300} y={15} textAnchor="middle"/>
 
 
+
+<VictoryPie // This additional pie chart was added as a last minute formatting preference. //
+// This adds a pie chart with a score of 100 as the background image. It makes the chart look smoother as opposed to two half-circles //
+  colorScale={["#90EE90"]}
+            standalone={false}
+            width={400} height={400}
+            data={course_progress_pie_100}
+            innerRadius={120}
+            cornerRadius={25}
+            labels={datum => (datum.x === "Total"? "": "")}
+          />
+
+
+
+
 <VictoryPie
 // changed none to #90EE90 //
   colorScale={["#008000", "#90EE90" ]}
@@ -773,6 +808,9 @@ style={{grid: {
                   text={course_progress_pie[0].y+"%"}
                   style={{ fontSize: 45 }}
                 />
+
+
+  
 </VictoryChart>
 
 

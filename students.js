@@ -1119,6 +1119,7 @@ for(let i =0; i<students.length; i++){
       progressbar_student_and_course.push({Student: students[i].SID, 
         Course: students[i].Course_Details[j].Name,
         CourseID: students[i].Course_Details[j].CID, 
+        Number_of_Courses_Read: d,
         Pct_Read: 100*d/students[i].Course_Details[j].Units.length,
         Pct_Remaining: 100-100*d/students[i].Course_Details[j].Units.length})
         //console.log(students[i].SID, students[i].Course_Details[j].Units, d)
